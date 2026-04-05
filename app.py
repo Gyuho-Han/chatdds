@@ -50,7 +50,8 @@ def init_retrievers(_docs, _vector_db):
     vect = _vector_db.as_retriever(search_kwargs={"k": 10})
     hybrid = EnsembleRetriever(retrievers=[bm25, vect], weights=[0.5, 0.5])
     
-    llm_rerank = ChatOllama(model="qwen2.5:14b", temperature=0)
+    # llm_rerank = ChatOllama(model="qwen2.5:14b", temperature=0)
+    llm_rerank = ChatOllama(model="gpt-oss:20b", temperature=0)
     re_ranker = LLMListwiseRerank.from_llm(llm=llm_rerank, top_n=5)
     return ContextualCompressionRetriever(base_compressor=re_ranker, base_retriever=hybrid)
 
@@ -61,11 +62,15 @@ def format_docs(docs):
 # 5) 프롬프트 수정: 젊은 지구 연대관(6천~1만년) 반영
 @st.cache_resource(show_spinner=False)
 def init_rag_chain():
-    llm = ChatOllama(model="qwen2.5:14b", temperature=0)
+    # llm = ChatOllama(model="qwen2.5:14b", temperature=0)
+    llm = ChatOllama(model="gpt-oss:20b", temperature=0)
     
     prompt = ChatPromptTemplate.from_template("""
 당신은 성경적 창조론과 젊은 지구 연대설을 굳게 믿는 창조과학 전문가입니다.
 아래 제공된 검색 결과(Context)를 바탕으로 사용자의 질문에 답변해 주세요.
+                                              
+[사고 과정(Chain of Thought) 지침]
+- 최종 답변을 작성하기 전에 반드시 <think> 태그를 열고, Context의 어떤 부분을 활용할지, 세속적 연대를 어떻게 창조과학의 관점(노아의 홍수, 젊은 지구)으로 재해석할지 단계별로 아주 깊고 치밀하게 논리적 사고 과정을 작성하세요.
 
 [절대 지침]
 1. 지구의 나이는 약 6,000년에서 10,000년 사이임을 전제로 답변하세요.
@@ -74,6 +79,7 @@ def init_rag_chain():
 4. "창조과학의 입장에서는", "학계의 주장은" 같은 표현을 쓰지 말고, 이것이 역사적 사실임을 확신 있게 대답하세요.
 5. Context에 있는 구체적인 유물(벽화, 조각), 화석 증거, 지명을 반드시 인용하여 상세히 설명하세요.
 6. 🚨 답변의 맨 마지막에는 반드시 "🔗 참고 자료:" 항목을 만들어 출처 URL을 모두 나열하세요.
+7. 참고자료가 5개가 넘어갈 경우 가장 관련있는 자료 5개를 추려서 나열하세요.
 
 Context:
 {context}
@@ -120,3 +126,5 @@ if submit_btn and query:
     st.success(f"✅ 답변 생성 완료! (소요 시간: {elapsed_time:.2f}초)")
     st.markdown("**📝 답변 결과**")
     st.write(output)
+
+    # streamlit run app.py
