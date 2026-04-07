@@ -11,6 +11,26 @@
 - **Hugging Face Reranker:** `BAAI/bge-reranker-v2-m3` (HuggingFace에서 자동 다운로드)
   - *참고: Mac 메모리 최적화를 위해 16-bit (`float16`) 정밀도를 사용하며, Apple Silicon(MPS) 및 일반 CPU 환경에 최적화되어 있습니다.*
 
+## 🏗 RAG 및 데이터베이스 구조 (Architecture)
+
+### 1. 데이터베이스 (Database)
+- **Vector Store:** ChromaDB를 사용하여 `chroma_db/` 폴더에 임베딩 데이터 저장.
+- **Source Data:** `rag_preprocessed_data.json` 기반 (제목, 내용 청크, URL 포함).
+- **Metadata:** `chunk_id`, `title`, `url` 정보를 포함하여 답변 시 출처 표기 가능.
+
+### 2. 하이브리드 검색 (Hybrid Retrieval)
+- **BM25 Retriever:** 키워드 기반의 전통적인 텍스트 검색 (Top 10).
+- **Vector Retriever:** 의미적 유사성 기반의 벡터 검색 (Top 10).
+- **Ensemble:** 두 검색 결과를 0.5:0.5 가중치로 결합하여 검색 정확도 극대화.
+
+### 3. 재정렬 (Reranking)
+- **Cross-Encoder:** `BAAI/bge-reranker-v2-m3` 모델을 사용하여 검색된 문서의 연관성 재평가.
+- **Top-N:** 재정렬된 문서 중 가장 관련성이 높은 상위 5개 문서만 선별하여 컨텍스트로 사용.
+
+### 4. 답변 생성 (Generation)
+- **Chain of Thought:** `<think>` 태그를 활용한 단계별 논리적 사고 과정 출력.
+- **Persona:** 창조과학 전문가 페르소나 적용 (젊은 지구 연대설, 노아의 홍수 기반 해석).
+
 ## 📦 패키지 설치 (Installation)
 
 ```bash
