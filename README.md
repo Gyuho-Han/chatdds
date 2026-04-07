@@ -8,8 +8,8 @@
 - **Ollama:** 로컬 LLM 및 임베딩 모델 실행을 위해 설치 필요
   - **LLM 모델:** `qwen2.5:14b` (Ollama)
   - **Embedding 모델:** `qwen3-embedding:8b` (Ollama)
-- **Hugging Face Reranker:** `Qwen/Qwen3-Reranker-4B` (HuggingFace에서 자동 다운로드)
-  - *참고: 4-bit 양자화 및 device_map="auto" 설정을 위해 NVIDIA GPU 환경(CUDA) 권장*
+- **Hugging Face Reranker:** `BAAI/bge-reranker-v2-m3` (HuggingFace에서 자동 다운로드)
+  - *참고: Mac 메모리 최적화를 위해 16-bit (`float16`) 정밀도를 사용하며, Apple Silicon(MPS) 및 일반 CPU 환경에 최적화되어 있습니다.*
 
 ## 📦 패키지 설치 (Installation)
 

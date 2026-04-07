@@ -1,6 +1,7 @@
 import streamlit as st
 import os, json, time
 from pathlib import Path
+import torch # Mac 환경을 위한 torch 임포트
 
 # LangChain 코어 모듈
 from langchain_core.documents import Document
@@ -10,10 +11,10 @@ from langchain_core.output_parsers import StrOutputParser
 
 from langchain_chroma import Chroma
 from langchain_community.retrievers import BM25Retriever
-from langchain.retrievers import EnsembleRetriever, ContextualCompressionRetriever # classic 대신 표준 경로 권장
+from langchain.retrievers import EnsembleRetriever, ContextualCompressionRetriever
 from langchain_ollama import ChatOllama, OllamaEmbeddings
 
-# 💡 전문 Reranker를 위한 모듈 임포트
+# 전문 Reranker를 위한 모듈 임포트
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 
@@ -47,7 +48,7 @@ def load_vectorstore(persist_directory="./chroma_db"):
     embed = OllamaEmbeddings(model="qwen3-embedding:8b")
     return Chroma(persist_directory=persist_directory, embedding_function=embed)
 
-# 3) Hybrid + Cross-Encoder Reranker 초기화 (✨ Qwen3 4비트 양자화 적용)
+# 3) Hybrid + Cross-Encoder Reranker 초기화
 @st.cache_resource(show_spinner=False)
 def init_retrievers(_docs, _vector_db):
     # BM25 및 Vector 검색기 설정
@@ -58,15 +59,22 @@ def init_retrievers(_docs, _vector_db):
     # 앙상블 리트리버 (하이브리드 검색)
     hybrid = EnsembleRetriever(retrievers=[bm25, vect], weights=[0.5, 0.5])
     
-    # 💡 4비트 양자화 설정 추가 (VRAM 절약의 핵심!)
-    model_kwargs = {
-        "load_in_4bit": True,
-        "device_map": "auto"
-    }
+    # =====================================================================
+    # 💡 [모델 선택 영역] 사용하시는 기기에 맞게 아래의 주석을 해제하여 사용하세요!
+    # =====================================================================
     
-    # 💡 BAAI 대신 Qwen3-Reranker 원본 모델 호출 및 압축 적용
+    # 💻 옵션 A: 16GB 메모리용 (초경량 고성능 BGE-M3 모델) 
+    model_name = "BAAI/bge-reranker-v2-m3"
+    model_kwargs = {"torch_dtype": torch.float16}
+
+    # 🖥️ 옵션 B: 32GB 메모리용 (무거운 Qwen3 4B 모델, 16-bit 사용)
+    # model_name = "Qwen/Qwen3-Reranker-4B"
+    # model_kwargs = {"torch_dtype": torch.float16, "trust_remote_code": True}
+    
+    # =====================================================================
+
     model = HuggingFaceCrossEncoder(
-        model_name="Qwen/Qwen3-Reranker-4B",
+        model_name=model_name,
         model_kwargs=model_kwargs
     )
     
