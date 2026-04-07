@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from langchain_core.documents import Document
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 
 # 로컬 임베딩을 위한 Ollama 라이브러리 임포트
 from langchain_ollama import OllamaEmbeddings
@@ -47,8 +47,9 @@ def ingest(json_path: str, persist_directory: str, batch_size: int = 100) -> Non
     ids = [doc.metadata.get("chunk_id") or f"doc_{i}" for i, doc in enumerate(docs)]
 
     # 3. 로컬 임베딩 모델 설정
-    print("Ollama bge-m3 모델을 준비 중입니다...")
-    embedding = OllamaEmbeddings(model="bge-m3")
+    print("Ollama qwen3-embedding:8b 모델을 준비 중입니다...")
+    # embedding = OllamaEmbeddings(model="bge-m3")
+    embedding = OllamaEmbeddings(model="qwen3-embedding:8b")
     
     # 4. Chroma 벡터DB 객체 생성 (데이터는 아직 넣지 않음)
     db = Chroma(persist_directory=persist_directory, embedding_function=embedding)

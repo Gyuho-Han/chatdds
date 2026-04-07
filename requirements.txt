@@ -5,6 +5,12 @@ langchain-core
 langchain-community
 langchain-ollama
 langchain-text-splitters
+langchain-chroma
 chromadb
 tqdm
 rank_bm25
+sentence-transformers
+transformers
+torch
+bitsandbytes
+accelerate
