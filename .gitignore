@@ -1,2 +1,4 @@
 rag_preprocessed_data.csv
 rag_preprocessed_data.json
+.env
+chroma_db/

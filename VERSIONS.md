@@ -4,7 +4,30 @@
 
 ---
 
-## [v0.0.2] - 2026-04-07 (현재 버전)
+## [v0.0.3] - 2026-04-08 (최신 버전)
+
+### 🌟 주요 특징 (Features)
+
+- **답변 정제 및 XML 태그 필터링**: 모델이 생성할 수 있는 불필요한 `<think>`, `<answer>`, `<response>` 등의 태그를 `clean_response` 함수를 통해 자동 제거하여 가독성 향상.
+- **UI 간소화**: "AI의 사고 과정" expander를 비활성화하고 최종 답변에만 집중하도록 사용자 인터페이스 개선.
+- **프롬프트 고도화**: 모든 형태의 XML/HTML 태그 사용을 금지하고, 출처(URL) 표기를 강제하는 강력한 페르소나 지침 적용.
+- **패키지 업데이트**: `langchain-classic`을 도입하여 최신 Ensemble 및 Reranking 모듈 구조로 변경.
+
+### 🤖 모델 구성 (Models)
+
+- **LLM (Generation):** `qwen2.5:14b` (via Ollama)
+- **Embedding:** `qwen3-embedding:8b` (via Ollama)
+- **Reranker:** `BAAI/bge-reranker-v2-m3` (via HuggingFace CrossEncoder)
+  - Optimization: `torch.float16` 적용
+
+### 🔍 RAG 구조 (RAG Architecture)
+
+- **Hybrid Retriever**: `langchain-classic`의 `EnsembleRetriever` 사용.
+- **Reranking**: `langchain-classic`의 `CrossEncoderReranker`를 통한 문서 재정렬.
+
+---
+
+## [v0.0.2] - 2026-04-07 (이전 버전)
 
 ### 🌟 주요 특징 (Features)
 
