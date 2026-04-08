@@ -5,7 +5,7 @@ langchain-core
 langchain-community
 langchain-ollama
 langchain-text-splitters
-langchain-chroma
+langchain-classic
 chromadb
 tqdm
 rank_bm25
