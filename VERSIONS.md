@@ -4,7 +4,32 @@
 
 ---
 
-## [v0.0.3] - 2026-04-08 (최신 버전)
+## [v0.0.4] - 2026-04-13 (최신 버전)
+
+### 🌟 주요 특징 (Features)
+
+- **하이퍼링크 출처 자동 첨부**: 답변 끝에 `[제목](URL)` 형식의 마크다운 하이퍼링크를 자동으로 생성하여 가독성과 접근성 향상.
+- **출처 중복 제거 로직**: 여러 청크에서 동일한 출처(URL)가 검색될 경우, 중복을 제거하고 고유한 링크만 노출되도록 개선.
+- **프롬프트 지침 강화**: LLM 모델이 직접 출처를 생성하지 않도록 강력한 지침을 추가하여, 시스템이 생성하는 정확한 링크와 충돌하지 않도록 조정.
+- **스트리밍 UI 및 상태 피드백 개선**: `st.status`를 도입하여 검색 및 재정렬 과정을 시각화하고, 실시간 스트리밍 답변 뒤에 출처가 안정적으로 결합되도록 UI 로직 개선.
+- **Retriever 안정성 강화**: Reranking 과정에서 오류 발생 시 기본 검색 결과(k=5)로 자동 폴백(Fallback)하는 예외 처리 추가.
+
+### 🤖 모델 구성 (Models)
+
+- **LLM (Generation):** `qwen2.5:14b` (via Ollama)
+- **Embedding:** `qwen3-embedding:8b` (via Ollama)
+- **Reranker:** `BAAI/bge-reranker-v2-m3` (via HuggingFace CrossEncoder)
+  - Optimization: `torch.float16` 적용
+
+### 🔍 RAG 구조 (RAG Architecture)
+
+- **Hybrid Retriever**: `langchain-classic`의 `EnsembleRetriever` 사용.
+- **Reranking**: `langchain-classic`의 `CrossEncoderReranker`를 통한 문서 재정렬.
+- **Reference Injection**: 시스템 레벨에서 고유 URL을 추출하여 하이퍼링크 리스트 자동 생성.
+
+---
+
+## [v0.0.3] - 2026-04-08 (이전 버전)
 
 ### 🌟 주요 특징 (Features)
 
