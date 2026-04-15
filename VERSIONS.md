@@ -4,7 +4,38 @@
 
 ---
 
-## [v0.0.4] - 2026-04-13 (최신 버전)
+## [v0.0.5] - 2026-04-15 (최신 버전)
+
+### 🌟 주요 특징 (Features)
+
+- **코드 모듈 분리**: 단일 `app.py`(294줄)를 `config.py`, `text_utils.py`, `retriever.py`, `chain.py`, `app.py`(120줄)로 분리하여 유지보수성 및 테스트 용이성 향상.
+- **설정값 중앙 관리**: 모델명, 경로, 파라미터 등 하드코딩된 설정값을 `config.py`로 통합하여 한 곳에서 관리.
+- **중복 코드 제거**: `app.py`와 `ingest_vector_db.py`에 중복 존재하던 `load_documents()` 함수를 `retriever.py`로 통합.
+- **데이터 파이프라인 통합**: `data_cleaning.py`와 `data_preprocessing_for_RAG.py`를 `data_pipeline.py`로 통합하여 1,2단계를 한 번에 실행.
+- **Reranker 모델 자동 전환**: `config.py`에서 `RERANKER_MODEL`만 변경하면 BAAI/Qwen 모델에 맞는 kwargs가 자동 적용.
+- **의존성 버전 고정**: `requirements.txt`에 최소 버전 제약을 추가하여 환경 재현성 향상.
+- **`.gitignore` 보강**: `__pycache__/`, `.DS_Store`, `.venv/` 등 표준 Python 제외 항목 추가.
+
+### 🤖 모델 구성 (Models)
+
+- **LLM (Generation):** `qwen2.5:14b` (via Ollama)
+- **Embedding:** `qwen3-embedding:8b` (via Ollama)
+- **Reranker:** `BAAI/bge-reranker-v2-m3` (via HuggingFace CrossEncoder)
+  - Optimization: `torch.float16` 적용
+
+### 📂 변경된 파일 구조 (File Structure)
+
+- `config.py` (신규): 설정값 중앙 관리
+- `text_utils.py` (신규): 텍스트 클리닝 유틸리티
+- `retriever.py` (신규): 문서 로딩, 검색, Reranker
+- `chain.py` (신규): LLM 프롬프트 및 생성 체인
+- `data_pipeline.py` (신규): 데이터 정제 + 전처리 통합
+- `app.py` (리팩터링): UI 로직만 담당
+- `ingest_vector_db.py` (리팩터링): 공통 모듈 임포트로 전환
+
+---
+
+## [v0.0.4] - 2026-04-13 (이전 버전)
 
 ### 🌟 주요 특징 (Features)
 
