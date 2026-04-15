@@ -2,3 +2,9 @@ rag_preprocessed_data.csv
 rag_preprocessed_data.json
 .env
 chroma_db/
+
+__pycache__/
+*.pyc
+.DS_Store
+*.egg-info/
+.venv/

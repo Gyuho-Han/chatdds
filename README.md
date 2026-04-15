@@ -44,31 +44,24 @@ pip install -r requirements.txt
 
 ## 🚀 실행 순서 (Running Order)
 
-1.  **데이터 정제 (Data Cleaning):**
-    `creation_science_data.csv`를 정제하여 `cleaned_creation_science_data.csv`를 생성합니다.
+1.  **데이터 정제 + 전처리 (Data Pipeline):**
+    `creation_science_data.csv`를 정제하고, 청크로 나누어 `rag_preprocessed_data.json`을 생성합니다.
 
     ```bash
-    python data_cleaning.py
+    python data_pipeline.py
     ```
 
-2.  **데이터 전처리 (Data Preprocessing):**
-    정제된 CSV를 읽어 청크로 나누고 `rag_preprocessed_data.json`을 생성합니다.
-
-    ```bash
-    python data_preprocessing_for_RAG.py
-    ```
-
-3.  **벡터 DB 적재 (Vector DB Ingestion):**
+2.  **벡터 DB 적재 (Vector DB Ingestion):**
     생성된 JSON 데이터를 `chroma_db` 폴더에 임베딩하여 저장합니다. (Ollama에서 `qwen3-embedding:8b` 모델이 실행 중이어야 합니다.)
     ```bash
     python ingest_vector_db.py
     ```
 
-3.1 **Google Drive에서 chroma_db 파일 다운**
-1,2,3 뛰어 넘어도 됨.
+2.1 **Google Drive에서 chroma_db 파일 다운**
+1,2 뛰어 넘어도 됨.
 https://drive.google.com/file/d/1zdxkGgW2R2mLA_XRxAENbLTTPSnNydI2/view?usp=drive_link
 
-4.  **애플리케이션 실행 (Run App):**
+3.  **애플리케이션 실행 (Run App):**
     Streamlit 웹 인터페이스를 실행합니다.
     ```bash
     streamlit run app.py
@@ -76,9 +69,12 @@ https://drive.google.com/file/d/1zdxkGgW2R2mLA_XRxAENbLTTPSnNydI2/view?usp=drive
 
 ## 📂 파일 구조 (File Structure)
 
-- `app.py`: Streamlit 챗봇 UI, Hybrid Retriever 및 Reranker 로직
-- `data_cleaning.py`: 중복 제거 및 노이즈 텍스트 정제
-- `data_preprocessing_for_RAG.py`: RecursiveCharacterTextSplitter를 이용한 청킹
+- `config.py`: 모델명, 경로, 파라미터 등 설정값 중앙 관리
+- `app.py`: Streamlit 챗봇 UI
+- `text_utils.py`: 텍스트 클리닝 및 태그 분리 유틸리티
+- `retriever.py`: 문서 로딩, 벡터DB, 하이브리드 검색 및 Reranker 로직
+- `chain.py`: LLM 프롬프트 및 생성 체인
+- `data_pipeline.py`: 데이터 정제 + RAG 전처리/청킹 통합 파이프라인
 - `ingest_vector_db.py`: ChromaDB 생성 및 Ollama 기반 임베딩 적재
 - `creation_science_data.csv`: 원본 데이터셋
 - `chroma_db/`: 벡터 데이터베이스 저장 폴더
