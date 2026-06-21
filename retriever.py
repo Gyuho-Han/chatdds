@@ -4,10 +4,11 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
-from langchain_ollama import OllamaEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 from config import (
-    RAG_JSON_PATH, CHROMA_DB_DIR, EMBEDDING_MODEL,
+    RAG_JSON_PATH, CHROMA_DB_DIR,
+    EMBEDDING_MODEL, EMBEDDING_TASK_TYPE_QUERY, GEMINI_API_KEY,
     RERANKER_MODEL, RERANKER_TOP_N,
     BM25_K, VECTOR_K, ENSEMBLE_WEIGHTS,
 )
@@ -33,10 +34,28 @@ def load_documents(path=RAG_JSON_PATH):
 
 def load_vectorstore(persist_directory=CHROMA_DB_DIR):
     """Chroma 벡터DB를 로드합니다."""
+    import time
+    import chromadb
+
     if not Path(persist_directory).exists():
         raise FileNotFoundError("벡터DB가 아직 생성되지 않았습니다. 데이터를 먼저 임베딩하세요.")
-    embed = OllamaEmbeddings(model=EMBEDDING_MODEL)
-    return Chroma(persist_directory=persist_directory, embedding_function=embed)
+    if not GEMINI_API_KEY:
+        raise ValueError(".env 파일에 GEMINI_API_KEY가 설정되어 있어야 합니다.")
+    embed = GoogleGenerativeAIEmbeddings(
+        model=EMBEDDING_MODEL,
+        google_api_key=GEMINI_API_KEY,
+        task_type=EMBEDDING_TASK_TYPE_QUERY,
+    )
+    last_exc = None
+    for attempt in range(3):
+        try:
+            client = chromadb.PersistentClient(path=str(persist_directory))
+            return Chroma(client=client, embedding_function=embed)
+        except Exception as e:
+            last_exc = e
+            if attempt < 2:
+                time.sleep(1 + attempt)
+    raise last_exc
 
 
 def init_retrievers(docs, vector_db):

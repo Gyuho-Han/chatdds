@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: chatdds-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    # appendonly: 컨테이너 재시작 후에도 캐시 유지
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:

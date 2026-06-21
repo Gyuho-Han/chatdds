@@ -10,7 +10,7 @@ import pandas as pd
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from config import (
-    RAW_CSV_PATH, CLEANED_CSV_PATH,
+    CLEANED_CSV_PATH,
     RAG_CSV_PATH, RAG_JSON_PATH,
     CHUNK_SIZE, CHUNK_OVERLAP,
 )
@@ -18,7 +18,7 @@ from config import (
 
 # ── 1단계: 원본 CSV 데이터 정제 ──
 
-def clean_data(input_file=RAW_CSV_PATH, output_file=CLEANED_CSV_PATH):
+def clean_data(input_file=CLEANED_CSV_PATH, output_file=CLEANED_CSV_PATH):
     if not os.path.exists(input_file):
         print(f"오류: {input_file} 파일이 현재 경로에 없습니다.")
         return None
@@ -107,9 +107,8 @@ def preprocess_for_rag(input_file=CLEANED_CSV_PATH, output_csv=RAG_CSV_PATH, out
 # ── 통합 실행 ──
 
 def main():
-    result = clean_data()
-    if result is not None:
-        preprocess_for_rag()
+    # cleaned_dataset.csv는 이미 정제된 데이터이므로 청킹 단계만 실행합니다.
+    preprocess_for_rag()
 
 
 if __name__ == "__main__":
