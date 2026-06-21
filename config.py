@@ -1,15 +1,32 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# ── API Keys ──
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 # ── Data Pipeline Paths ──
-RAW_CSV_PATH = "creation_science_data.csv"
-CLEANED_CSV_PATH = "cleaned_creation_science_data.csv"
+CLEANED_CSV_PATH = "cleaned_dataset.csv"
 RAG_CSV_PATH = "rag_preprocessed_data.csv"
 RAG_JSON_PATH = "rag_preprocessed_data.json"
 
 # ── Vector DB ──
 CHROMA_DB_DIR = "./chroma_db"
 
+# ── Redis 캐시 ──
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+CACHE_ENABLED = os.getenv("CACHE_ENABLED", "true").lower() == "true"
+CACHE_TTL = int(os.getenv("CACHE_TTL", "604800"))  # 캐시 유효기간(초), 기본 7일
+
 # ── Models ──
-EMBEDDING_MODEL = "qwen3-embedding:8b"
+# Google Gemini embedding (max 2048 input tokens, 3072 output dims by default)
+EMBEDDING_MODEL = "models/gemini-embedding-001"
+EMBEDDING_TASK_TYPE_DOC = "retrieval_document"
+EMBEDDING_TASK_TYPE_QUERY = "retrieval_query"
+
 LLM_MODEL = "qwen2.5:14b"
+# LLM_MODEL = "gemma4:12b"
 
 # Reranker (16GB: "BAAI/bge-reranker-v2-m3", 32GB: "Qwen/Qwen3-Reranker-4B")
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
@@ -27,5 +44,7 @@ LLM_REPEAT_PENALTY = 1.15
 LLM_STOP_TOKENS = ["<|im_end|>", "User:", "Question:"]
 
 # ── Chunking Parameters ──
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
+# gemini-embedding-001 max 2048 tokens; Korean ~1.0-1.5 tokens/char.
+# 800 chars / 100 overlap balances context vs. retrieval precision.
+CHUNK_SIZE = 800
+CHUNK_OVERLAP = 100

@@ -4,7 +4,38 @@
 
 ---
 
-## [v0.0.5] - 2026-04-15 (최신 버전)
+## [v0.0.6] - 2026-06-21 (최신 버전)
+
+### 🌟 주요 특징 (Features)
+
+- **Redis 답변 캐싱 도입**: `질문(+대화 맥락) → 최종 답변`을 통째로 Redis에 캐싱하여, 동일 질문 재요청 시 하이브리드 검색·Cross-Encoder 리랭킹·LLM 생성을 모두 건너뛰고 즉시 응답.
+- **캐시 키 정규화**: 질문을 소문자화·문장부호 제거·공백 제거 후 SHA-256 해시로 변환하여, `"홍수 지질학이 뭐야?"`와 `"홍수지질학이 뭐야"`처럼 사소한 표현 차이도 동일 캐시로 처리. (의미가 다른 질문은 그대로 구분)
+- **맥락 인지 캐싱**: 캐시 키에 대화 기록(`chat_history`)을 포함하여, 같은 질문이라도 대화 맥락이 다르면 별도 답변을 캐싱.
+- **품질 필터링**: 리랭킹 폴백(Fallback)이 발생한 답변은 품질이 낮을 수 있어 캐싱에서 제외. 다음 동일 질문 시 리랭킹을 재시도.
+- **Graceful Degradation**: Redis가 꺼져 있거나 연결이 실패해도 캐시 함수가 조용히 우회되어 앱이 정상 동작 (매번 새로 생성).
+- **TTL 자동 만료**: 캐시된 답변은 `CACHE_TTL`(기본 7일) 경과 시 자동 만료되어 오래된 답변이 영구히 남지 않음.
+- **Docker 기반 Redis**: `docker-compose.yml`로 `redis:7-alpine`을 격리 실행 (AOF 영속성 + 헬스체크 포함). `docker compose up -d` 한 줄로 구동.
+
+### 🤖 모델 구성 (Models)
+
+- **LLM (Generation):** `qwen2.5:14b` (via Ollama)
+- **Embedding:** `qwen3-embedding:8b` (via Ollama)
+- **Reranker:** `BAAI/bge-reranker-v2-m3` (via HuggingFace CrossEncoder)
+  - Optimization: `torch.float16` 적용
+- **Cache:** Redis 7 (via Docker, `redis-py` 클라이언트)
+
+### 📂 변경된 파일 구조 (File Structure)
+
+- `cache.py` (신규): Redis 연결 및 답변 캐시 get/set, 키 정규화, graceful degradation
+- `docker-compose.yml` (신규): Redis 7 서비스 정의 (포트 6379, 영속 볼륨, 헬스체크)
+- `config.py` (수정): `REDIS_URL`, `CACHE_ENABLED`, `CACHE_TTL` 설정 추가
+- `app.py` (수정): 답변 생성 전 캐시 조회 → 미스 시 파이프라인 실행 후 캐시 저장 (리랭킹 폴백 시 저장 제외)
+- `requirements.txt` (수정): `redis>=5.0` 의존성 추가
+- `.env` (수정): `REDIS_URL`, `CACHE_ENABLED`, `CACHE_TTL` 항목 추가
+
+---
+
+## [v0.0.5] - 2026-04-15 (이전 버전)
 
 ### 🌟 주요 특징 (Features)
 

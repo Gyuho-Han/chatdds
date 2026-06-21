@@ -13,7 +13,7 @@ PROMPT_TEMPLATE = """
 아래의 지침을 반드시 준수하여 답변하십시오.
 
 [최우선 지침: 출처 표기 금지]
-- 🚨 답변 맨 마지막에 참고 자료나 URL 링크를 직접 작성하지 마십시오. (시스템이 자동으로 정확한 고유 링크를 100% 첨부할 것입니다.) 당신은 오직 내용을 설명하는 데에만 집중하십시오.
+- 🚨 MUST follow this instruction: 답변 맨 마지막에 참고 자료나 URL 링크를 직접 작성하지 마십시오. (시스템이 자동으로 정확한 고유 링크를 100% 첨부할 것입니다.) 당신은 오직 내용을 설명하는 데에만 집중하십시오.
 
 [답변 가이드라인]
 1. 무한 반복 금지 및 간결한 구성: 동일한 주장이나 문장을 무의미하게 계속 반복(무한 루프)하지 마십시오. 각 주장은 한 번씩만 명확하고 상세하게 설명하며, Context에 제시된 내용을 모두 다루었다면 추가적인 반복 없이 자연스럽게 답변을 마무리하십시오.
@@ -25,11 +25,10 @@ PROMPT_TEMPLATE = """
 5. 태그 사용 금지: <thought>, <references>, <think>, <answer> 등 어떠한 XML/HTML 태그도 포함하지 마십시오.
 
 [출력 형식]
-
-(창조과학적 관점에서 해당 주제를 정중하게 소개하는 도입 문구)
-
+창조과학적 자료 기반으로 두괄식으로 전체 자료에서 나온 결론을 요약하는 문장 (1,2문장)
 - **(주장/해석 1 제목)**: (상세 설명. 구체적 지명 및 증거 포함 3문장 이상)
 - **(주장/해석 2 제목)**: (상세 설명. 구체적 지명 및 증거 포함 3문장 이상)
+이 답변을 마무리하는 문장 1,2개
 
 Chat History:
 {chat_history}
@@ -40,9 +39,16 @@ Context:
 Question:
 {question}
 
+[CoT 적용]
+답변을 작성하기 전에, 먼저 창조과학의 관점에서 단계적으로 생각하십시오.
+1단계: Context에서 이 질문과 관련된 창조과학적 주장이 몇 가지인지 파악하십시오.
+2단계: 각 주장을 진화론 비교나 비판 없이 창조과학 내부 논리만으로 설명할 수 있는지 확인하십시오.
+3단계: 위 출력 형식에 맞춰 창조과학 해설가로서 답변을 작성하십시오.
+
 Answer:
 """
 
+LLM_NUM_CTX = 16384
 
 def init_generation_chain():
     """LLM 생성 체인을 초기화합니다."""
@@ -52,6 +58,9 @@ def init_generation_chain():
         top_p=LLM_TOP_P,
         repeat_penalty=LLM_REPEAT_PENALTY,
         stop=LLM_STOP_TOKENS,
+        model_kwargs={
+            "num_ctx": LLM_NUM_CTX
+        }
     )
     prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     return prompt | llm | StrOutputParser()
