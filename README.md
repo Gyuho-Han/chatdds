@@ -83,7 +83,7 @@ CACHE_TTL = 604800                     # 캐시 유효기간(초), 기본 7일
 
 2.1 **Google Drive에서 chroma_db 파일 다운**
 1,2 뛰어 넘어도 됨.
-https://drive.google.com/file/d/1zdxkGgW2R2mLA_XRxAENbLTTPSnNydI2/view?usp=drive_link
+https://drive.google.com/file/d/1fJrSIh9gprEh8WU65v_vtT3LARoLQhuc/view?usp=drive_link
 
 3.  **애플리케이션 실행 (Run App):**
     Streamlit 웹 인터페이스를 실행합니다.
