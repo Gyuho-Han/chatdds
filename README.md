@@ -6,7 +6,7 @@
 
 - **Python:** 3.9 이상
 - **Ollama:** 로컬 LLM 및 임베딩 모델 실행을 위해 설치 필요
-  - **LLM 모델:** `qwen2.5:14b` (Ollama)
+  - **LLM 모델:** `qwen3:14b` (Ollama)
   - **Embedding 모델:** `qwen3-embedding:8b` (Ollama)
 - **Hugging Face Reranker:** `BAAI/bge-reranker-v2-m3` (HuggingFace에서 자동 다운로드)
   - _참고: Mac 메모리 최적화를 위해 16-bit (`float16`) 정밀도를 사용하며, Apple Silicon(MPS) 및 일반 CPU 환경에 최적화되어 있습니다._

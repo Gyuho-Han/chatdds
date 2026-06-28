@@ -2,12 +2,12 @@ import argparse
 from pathlib import Path
 
 from langchain_chroma import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from tqdm import tqdm
 
 from config import (
-    EMBEDDING_MODEL, EMBEDDING_TASK_TYPE_DOC,
-    RAG_JSON_PATH, CHROMA_DB_DIR, GEMINI_API_KEY,
+    EMBEDDING_MODEL, OLLAMA_BASE_URL,
+    RAG_JSON_PATH, CHROMA_DB_DIR,
 )
 from retriever import load_documents
 
@@ -17,9 +17,6 @@ def ingest(json_path: str, persist_directory: str, batch_size: int = 100) -> Non
     if not source_path.exists():
         raise FileNotFoundError(f"JSON 파일을 찾을 수 없습니다: {json_path}")
 
-    if not GEMINI_API_KEY:
-        raise ValueError(".env 파일에 GEMINI_API_KEY가 설정되어 있어야 합니다.")
-
     # 1. 문서 로드
     docs = load_documents(json_path)
     print(f"총 {len(docs)}개의 청크를 로드했습니다.")
@@ -27,12 +24,11 @@ def ingest(json_path: str, persist_directory: str, batch_size: int = 100) -> Non
     # 2. 문서 ID 추출
     ids = [doc.metadata.get("chunk_id") or f"doc_{i}" for i, doc in enumerate(docs)]
 
-    # 3. Google Gemini 임베딩 모델 설정 (문서 임베딩용 task_type)
-    print(f"Google {EMBEDDING_MODEL} 모델을 준비 중입니다...")
-    embedding = GoogleGenerativeAIEmbeddings(
+    # 3. 로컬 Ollama 임베딩 모델 설정 (무료/로컬)
+    print(f"Ollama {EMBEDDING_MODEL} 모델을 준비 중입니다... (Ollama 실행 필요)")
+    embedding = OllamaEmbeddings(
         model=EMBEDDING_MODEL,
-        google_api_key=GEMINI_API_KEY,
-        task_type=EMBEDDING_TASK_TYPE_DOC,
+        base_url=OLLAMA_BASE_URL,
     )
 
     # 4. Chroma 벡터DB 객체 생성

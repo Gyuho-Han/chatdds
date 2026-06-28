@@ -4,7 +4,6 @@ langchain>=0.3
 langchain-core>=0.3
 langchain-community>=0.3
 langchain-ollama>=0.2
-langchain-google-genai>=2.0
 langchain-text-splitters>=0.3
 python-dotenv>=1.0
 langchain-classic>=0.1
