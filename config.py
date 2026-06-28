@@ -3,9 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── API Keys ──
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
 # ── Data Pipeline Paths ──
 CLEANED_CSV_PATH = "cleaned_dataset.csv"
 RAG_CSV_PATH = "rag_preprocessed_data.csv"
@@ -20,12 +17,11 @@ CACHE_ENABLED = os.getenv("CACHE_ENABLED", "true").lower() == "true"
 CACHE_TTL = int(os.getenv("CACHE_TTL", "604800"))  # 캐시 유효기간(초), 기본 7일
 
 # ── Models ──
-# Google Gemini embedding (max 2048 input tokens, 3072 output dims by default)
-EMBEDDING_MODEL = "models/gemini-embedding-001"
-EMBEDDING_TASK_TYPE_DOC = "retrieval_document"
-EMBEDDING_TASK_TYPE_QUERY = "retrieval_query"
+# Local Ollama embedding (무료/로컬, qwen3-embedding:8b -> 4096-dim)
+EMBEDDING_MODEL = "qwen3-embedding:8b"
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
-LLM_MODEL = "qwen2.5:14b"
+LLM_MODEL = "qwen3:14b"
 # LLM_MODEL = "gemma4:12b"
 
 # Reranker (16GB: "BAAI/bge-reranker-v2-m3", 32GB: "Qwen/Qwen3-Reranker-4B")

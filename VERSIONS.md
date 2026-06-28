@@ -4,7 +4,51 @@
 
 ---
 
-## [v0.0.6] - 2026-06-21 (최신 버전)
+## [v0.0.8] - 2026-06-27 (최신 버전)
+
+### 🌟 주요 특징 (Features)
+
+- **임베딩 로컬 전환 (비용 제거)**: 임베딩을 Google Gemini API(`models/gemini-embedding-001`)에서 로컬 Ollama 모델 `qwen3-embedding:8b`로 교체. 초기 인덱싱 및 RAG 질의 시 발생하던 API 요금을 완전히 제거.
+- **Gemini 의존성 제거**: `GEMINI_API_KEY` 및 `langchain-google-genai` 의존성 제거. 임베딩 차원이 변경되므로(3072 → 4096) **기존 `chroma_db`는 폐기하고 재임베딩 필요** (`python ingest_vector_db.py`).
+
+### 🤖 모델 구성 (Models)
+
+- **LLM (Generation):** `qwen3:14b` (via Ollama)
+- **Embedding:** `qwen3-embedding:8b` (via Ollama, 로컬)
+- **Reranker:** `BAAI/bge-reranker-v2-m3` (via HuggingFace CrossEncoder)
+  - Optimization: `torch.float16` 적용
+- **Cache:** Redis 7 (via Docker, `redis-py` 클라이언트)
+
+### 📂 변경된 파일 구조 (File Structure)
+
+- `config.py` (수정): `EMBEDDING_MODEL`을 `qwen3-embedding:8b`로 변경, `OLLAMA_BASE_URL` 추가, `GEMINI_API_KEY`·Gemini task_type 설정 제거
+- `ingest_vector_db.py` (수정): `OllamaEmbeddings`로 문서 임베딩 전환
+- `retriever.py` (수정): `OllamaEmbeddings`로 질의 임베딩 전환
+- `requirements.txt` (수정): `langchain-google-genai` 의존성 제거
+
+---
+
+## [v0.0.7] - 2026-06-27 (이전 버전)
+
+### 🌟 주요 특징 (Features)
+
+- **LLM 모델 업그레이드**: 생성 모델을 `qwen2.5:14b`에서 `qwen3:14b`로 교체.
+
+### 🤖 모델 구성 (Models)
+
+- **LLM (Generation):** `qwen3:14b` (via Ollama)
+- **Embedding:** `qwen3-embedding:8b` (via Ollama)
+- **Reranker:** `BAAI/bge-reranker-v2-m3` (via HuggingFace CrossEncoder)
+  - Optimization: `torch.float16` 적용
+- **Cache:** Redis 7 (via Docker, `redis-py` 클라이언트)
+
+### 📂 변경된 파일 구조 (File Structure)
+
+- `config.py` (수정): `LLM_MODEL`을 `qwen3:14b`로 변경
+
+---
+
+## [v0.0.6] - 2026-06-21 (이전 버전)
 
 ### 🌟 주요 특징 (Features)
 

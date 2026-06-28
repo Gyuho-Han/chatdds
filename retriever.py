@@ -4,11 +4,11 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 from langchain_chroma import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 
 from config import (
     RAG_JSON_PATH, CHROMA_DB_DIR,
-    EMBEDDING_MODEL, EMBEDDING_TASK_TYPE_QUERY, GEMINI_API_KEY,
+    EMBEDDING_MODEL, OLLAMA_BASE_URL,
     RERANKER_MODEL, RERANKER_TOP_N,
     BM25_K, VECTOR_K, ENSEMBLE_WEIGHTS,
 )
@@ -39,12 +39,9 @@ def load_vectorstore(persist_directory=CHROMA_DB_DIR):
 
     if not Path(persist_directory).exists():
         raise FileNotFoundError("벡터DB가 아직 생성되지 않았습니다. 데이터를 먼저 임베딩하세요.")
-    if not GEMINI_API_KEY:
-        raise ValueError(".env 파일에 GEMINI_API_KEY가 설정되어 있어야 합니다.")
-    embed = GoogleGenerativeAIEmbeddings(
+    embed = OllamaEmbeddings(
         model=EMBEDDING_MODEL,
-        google_api_key=GEMINI_API_KEY,
-        task_type=EMBEDDING_TASK_TYPE_QUERY,
+        base_url=OLLAMA_BASE_URL,
     )
     last_exc = None
     for attempt in range(3):
